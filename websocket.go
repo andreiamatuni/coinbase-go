@@ -6,7 +6,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-const cbWSAddress = "wss://ws-feed.exchange.coinbase.com"
+const CoinbaseWSAddress = "wss://ws-feed.exchange.coinbase.com"
 
 // subscription products (different currency markets)
 var subscribeMessage = map[string]string{
@@ -21,7 +21,7 @@ type WSConnection struct {
 
 func NewWSConnection() (WSConnection, error) {
 	var wsDialer websocket.Dialer
-	connection, _, err := wsDialer.Dial(cbWSAddress, nil)
+	connection, _, err := wsDialer.Dial(CoinbaseWSAddress, nil)
 
 	if err != nil {
 		return WSConnection{}, err
@@ -41,18 +41,18 @@ func (wsConn *WSConnection) Subscribe(product string) error {
 			return err
 		}
 	case "BTC-EUR":
-		subscribeMessage["product_id"] = "BTC-EUR"
+		subscribeMessage["product_id"] = product
 		if err := wsConn.Connection.WriteJSON(subscribeMessage); err != nil {
 			return err
 		}
 
 	case "BTC-GBP":
-		subscribeMessage["product_id"] = "BTC-GBP"
+		subscribeMessage["product_id"] = product
 		if err := wsConn.Connection.WriteJSON(subscribeMessage); err != nil {
 			return err
 		}
 	case "BTC-CAD":
-		subscribeMessage["product_id"] = "BTC-CAD"
+		subscribeMessage["product_id"] = product
 		if err := wsConn.Connection.WriteJSON(subscribeMessage); err != nil {
 			return err
 		}
