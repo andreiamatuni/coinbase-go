@@ -1,12 +1,4 @@
-package main
-
-import (
-	"fmt"
-
-	ws "github.com/gorilla/websocket"
-)
-
-const wsAddress = "wss://ws-feed.exchange.coinbase.com"
+package coinbase
 
 type Message struct {
 	Type          string  `json:"type"`
@@ -27,36 +19,4 @@ type Message struct {
 	Funds         float64 `json:"funds,string"`
 	NewFunds      float64 `json:"new_funds,string"`
 	OldFunds      float64 `json:"old_funds,string"`
-}
-
-func main() {
-	var wsDialer ws.Dialer
-	wsConn, _, err := wsDialer.Dial(wsAddress, nil)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-
-	subscribe := map[string]string{
-		"type":       "subscribe",
-		"product_id": "BTC-USD",
-	}
-
-	if err := wsConn.WriteJSON(subscribe); err != nil {
-		fmt.Println(err.Error())
-	}
-
-	message := Message{}
-
-	for true {
-		if err := wsConn.ReadJSON(&message); err != nil {
-			fmt.Println(err.Error())
-			break
-		}
-		fmt.Println(message)
-
-		if message.Type == "match" {
-			fmt.Println("Got a match")
-		}
-	}
-
 }
