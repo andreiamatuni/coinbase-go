@@ -28,8 +28,8 @@ func NewWSConnection() (WSConnection, error) {
 	}
 
 	wsConn := WSConnection{
-		Connection:  connection,
-		MessageChan: make(chan Message, 1024),
+		Connection: connection,
+		//	MessageChan: make(chan Message, 1024),
 	}
 	return wsConn, nil
 }
@@ -42,13 +42,16 @@ func (wsConn *WSConnection) Subscribe() error {
 }
 
 func (wsConn *WSConnection) StartReadLoop() error {
-	for true {
-		if err := wsConn.Connection.ReadJSON(wsConn.CurrMessage); err != nil {
-			return err
+	go func() error {
+		for true {
+			if err := wsConn.Connection.ReadJSON(&wsConn.CurrMessage); err != nil {
+				return err
+			}
+
+			fmt.Println(wsConn.CurrMessage)
 		}
-		wsConn.MessageChan <- wsConn.CurrMessage
-		fmt.Println(wsConn.CurrMessage)
-	}
+		return nil
+	}()
 	return nil
 }
 

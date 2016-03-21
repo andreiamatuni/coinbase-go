@@ -5,8 +5,12 @@ import "testing"
 func TestWSRead(t *testing.T) {
 	wsConn, err := NewWSConnection()
 	if err != nil {
-		wsConn.Subscribe()
-		wsConn.StartReadLoop()
+		t.Error("NewWSConnection failed.")
+	}
+	wsConn.Subscribe()
+	wsConn.StartReadLoop()
+	for true {
+		t.Log("Current Message: %v", wsConn.CurrMessage)
 	}
 
 }
