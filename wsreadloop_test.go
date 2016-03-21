@@ -7,7 +7,7 @@ func TestWSReadLoop(t *testing.T) {
 	if err != nil {
 		t.Error("NewWSConnection failed.")
 	}
-	wsConn.Subscribe("BTC-EUR")
+	wsConn.Subscribe("BTC-USD")
 	var message Message
 	var done chan bool
 

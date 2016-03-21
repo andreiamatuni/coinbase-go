@@ -9,27 +9,10 @@ import (
 const cbWSAddress = "wss://ws-feed.exchange.coinbase.com"
 
 // subscription products (different currency markets)
-var (
-	subscribeBTCUSD = map[string]string{
-		"type":       "subscribe",
-		"product_id": "BTC-USD",
-	}
-
-	subscribeBTCEUR = map[string]string{
-		"type":       "subscribe",
-		"product_id": "BTC-EUR",
-	}
-
-	subscribeBTCGBP = map[string]string{
-		"type":       "subscribe",
-		"product_id": "BTC-GBP",
-	}
-
-	subscribeBTCCAD = map[string]string{
-		"type":       "subscribe",
-		"product_id": "BTC-CAD",
-	}
-)
+var subscribeMessage = map[string]string{
+	"type":       "subscribe",
+	"product_id": "BTC-USD",
+}
 
 type WSConnection struct {
 	Connection *websocket.Conn
@@ -54,20 +37,23 @@ func (wsConn *WSConnection) Subscribe(product string) error {
 
 	switch product {
 	case "BTC-USD":
-		if err := wsConn.Connection.WriteJSON(subscribeBTCUSD); err != nil {
+		if err := wsConn.Connection.WriteJSON(subscribeMessage); err != nil {
 			return err
 		}
 	case "BTC-EUR":
-		if err := wsConn.Connection.WriteJSON(subscribeBTCEUR); err != nil {
+		subscribeMessage["product_id"] = "BTC-EUR"
+		if err := wsConn.Connection.WriteJSON(subscribeMessage); err != nil {
 			return err
 		}
 
 	case "BTC-GBP":
-		if err := wsConn.Connection.WriteJSON(subscribeBTCGBP); err != nil {
+		subscribeMessage["product_id"] = "BTC-GBP"
+		if err := wsConn.Connection.WriteJSON(subscribeMessage); err != nil {
 			return err
 		}
 	case "BTC-CAD":
-		if err := wsConn.Connection.WriteJSON(subscribeBTCCAD); err != nil {
+		subscribeMessage["product_id"] = "BTC-CAD"
+		if err := wsConn.Connection.WriteJSON(subscribeMessage); err != nil {
 			return err
 		}
 
