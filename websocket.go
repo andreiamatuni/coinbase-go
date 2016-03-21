@@ -8,15 +8,32 @@ import (
 
 const cbWSAddress = "wss://ws-feed.exchange.coinbase.com"
 
-var subscribeMessage = map[string]string{
-	"type":       "subscribe",
-	"product_id": "BTC-USD",
-}
+// subscription products (different currency markets)
+var (
+	subscribeBTCUSD = map[string]string{
+		"type":       "subscribe",
+		"product_id": "BTC-USD",
+	}
+
+	subscribeBTCEUR = map[string]string{
+		"type":       "subscribe",
+		"product_id": "BTC-EUR",
+	}
+
+	subscribeBTCGBP = map[string]string{
+		"type":       "subscribe",
+		"product_id": "BTC-GBP",
+	}
+
+	subscribeBTCCAD = map[string]string{
+		"type":       "subscribe",
+		"product_id": "BTC-CAD",
+	}
+)
 
 type WSConnection struct {
-	Connection  *websocket.Conn
-	MessageChan chan Message
-	CurrMessage Message
+	Connection *websocket.Conn
+	Message    *Message
 }
 
 func NewWSConnection() (WSConnection, error) {
@@ -29,59 +46,46 @@ func NewWSConnection() (WSConnection, error) {
 
 	wsConn := WSConnection{
 		Connection: connection,
-		//	MessageChan: make(chan Message, 1024),
 	}
 	return wsConn, nil
 }
 
-func (wsConn *WSConnection) Subscribe() error {
-	if err := wsConn.Connection.WriteJSON(subscribeMessage); err != nil {
-		return err
+func (wsConn *WSConnection) Subscribe(product string) error {
+
+	switch product {
+	case "BTC-USD":
+		if err := wsConn.Connection.WriteJSON(subscribeBTCUSD); err != nil {
+			return err
+		}
+	case "BTC-EUR":
+		if err := wsConn.Connection.WriteJSON(subscribeBTCEUR); err != nil {
+			return err
+		}
+
+	case "BTC-GBP":
+		if err := wsConn.Connection.WriteJSON(subscribeBTCGBP); err != nil {
+			return err
+		}
+	case "BTC-CAD":
+		if err := wsConn.Connection.WriteJSON(subscribeBTCCAD); err != nil {
+			return err
+		}
+
 	}
 	return nil
 }
 
-func (wsConn *WSConnection) StartReadLoop() error {
-	go func() error {
-		for true {
-			if err := wsConn.Connection.ReadJSON(&wsConn.CurrMessage); err != nil {
-				return err
-			}
-
-			fmt.Println(wsConn.CurrMessage)
+func (wsConn *WSConnection) ReadLoop(message *Message, done chan bool) error {
+	wsConn.Message = message
+	for {
+		if err := wsConn.Connection.ReadJSON(message); err != nil {
+			fmt.Println("something went wrong")
+			return err
 		}
-		return nil
-	}()
+
+		fmt.Println(message)
+
+	}
+	done <- true
 	return nil
 }
-
-/*func thing() {*/
-//var wsDialer ws.Dialer
-//wsConn, _, err := wsDialer.Dial(wsAddress, nil)
-//if err != nil {
-//fmt.Println(err.Error())
-//}
-
-//subscribe := map[string]string{
-//"type":       "subscribe",
-//"product_id": "BTC-USD",
-//}
-
-//if err := wsConn.WriteJSON(subscribe); err != nil {
-//fmt.Println(err.Error())
-//}
-
-//message := Message{}
-
-//for true {
-//if err := wsConn.ReadJSON(&message); err != nil {
-//fmt.Println(err.Error())
-//break
-//}
-//fmt.Println(message)
-
-//if message.Type == "match" {
-//fmt.Println("Got a match")
-//}
-//}
-/*}*/
