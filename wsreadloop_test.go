@@ -22,7 +22,8 @@ func TestWSReadLoop(t *testing.T) {
 	for i := 0; i < 30; i++ {
 		time.Sleep(time.Second * 2)
 		fmt.Printf("Current queue size: %d\n", queue.Size())
-		fmt.Printf("Last message recieved: %v\n\n", queue.Tail().Next().Value())
+		fmt.Printf("Last message recieved: %v\n", queue.Tail().Next().Value())
+		fmt.Printf("Memory footprint of queue: %d bytes\n\n", queue.MemoryFootprint())
 	}
 
 	<-done

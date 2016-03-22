@@ -61,7 +61,6 @@ func (wsConn *WSConnection) Subscribe(product string) error {
 
 func (wsConn *WSConnection) ReadLoop(queue *MessageQueue, done chan bool) error {
 	message := Message{}
-	//wsConn.Message = message
 	wsConn.MessageQueue = queue
 	for {
 		if err := wsConn.Connection.ReadJSON(&message); err != nil {

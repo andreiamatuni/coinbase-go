@@ -3,6 +3,7 @@ package coinbase
 import (
 	"errors"
 	"fmt"
+	"unsafe"
 )
 
 /*
@@ -65,6 +66,10 @@ func (q *MessageQueue) Pop() (*Node, error) {
 
 func (q *MessageQueue) Size() int {
 	return q.size
+}
+
+func (q *MessageQueue) MemoryFootprint() int {
+	return q.size * int(unsafe.Sizeof(*q.Tail().Next().Value()))
 }
 
 func (q *MessageQueue) Head() *Node {
