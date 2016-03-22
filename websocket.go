@@ -15,8 +15,9 @@ var subscribeMessage = map[string]string{
 }
 
 type WSConnection struct {
-	Connection *websocket.Conn
-	Message    *Message
+	Connection   *websocket.Conn
+	Message      *Message
+	MessageQueue *MessageQueue
 }
 
 func NewWSConnection() (WSConnection, error) {
@@ -34,7 +35,6 @@ func NewWSConnection() (WSConnection, error) {
 }
 
 func (wsConn *WSConnection) Subscribe(product string) error {
-
 	switch product {
 	case "BTC-USD":
 		if err := wsConn.Connection.WriteJSON(subscribeMessage); err != nil {
@@ -45,7 +45,6 @@ func (wsConn *WSConnection) Subscribe(product string) error {
 		if err := wsConn.Connection.WriteJSON(subscribeMessage); err != nil {
 			return err
 		}
-
 	case "BTC-GBP":
 		subscribeMessage["product_id"] = product
 		if err := wsConn.Connection.WriteJSON(subscribeMessage); err != nil {
@@ -56,21 +55,20 @@ func (wsConn *WSConnection) Subscribe(product string) error {
 		if err := wsConn.Connection.WriteJSON(subscribeMessage); err != nil {
 			return err
 		}
-
 	}
 	return nil
 }
 
-func (wsConn *WSConnection) ReadLoop(message *Message, done chan bool) error {
-	wsConn.Message = message
+func (wsConn *WSConnection) ReadLoop(queue *MessageQueue, done chan bool) error {
+	message := Message{}
+	//wsConn.Message = message
+	wsConn.MessageQueue = queue
 	for {
-		if err := wsConn.Connection.ReadJSON(message); err != nil {
+		if err := wsConn.Connection.ReadJSON(&message); err != nil {
 			fmt.Println("something went wrong")
 			return err
 		}
-
-		fmt.Println(message)
-
+		wsConn.MessageQueue.Push(&message)
 	}
 	done <- true
 	return nil
